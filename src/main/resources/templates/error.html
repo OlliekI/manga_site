@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MangaHub - Error</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</head>
+<body>
+<main class="site-main error-page">
+    <div class="container">
+        <h1 class="error-title"><i class="fas fa-exclamation-triangle"></i> An Error Occurred</h1>
+        <p class="error-message" th:text="${error}">Error message here</p>
+        <a href="/" class="btn btn-primary"><i class="fas fa-home"></i> Go to Home</a>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; 2024 MangaHub | <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
+    </div>
+</footer>
+</body>
+</html>

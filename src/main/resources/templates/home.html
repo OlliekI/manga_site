@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MangaHub - Home</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #e0e0e0;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00ffff;
+            margin-bottom: 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+        }
+
+        nav a {
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+
+        nav a:hover {
+            color: #f59e0b;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            background-color: #00ffff;
+            color: #000;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #f59e0b;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        .manga-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .manga-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            background: #1a1a1a;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            height: auto; /* Adjust height to fit content */
+            position: relative;
+            padding: 20px;
+        }
+
+        .manga-item:hover {
+            transform: scale(1.05);
+        }
+
+        img {
+            width: 200px;
+            height: auto; /* Prevent image cropping */
+            object-fit: contain;
+            border-radius: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: row;
+            flex-grow: 1;
+            margin-bottom: 20px; /* Increase spacing between content and chapter info */
+        }
+
+        .pl-3 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            margin-bottom: 10px; /* Increase spacing below the title */
+        }
+
+        h3:hover {
+            color: #f59e0b;
+        }
+
+        .description {
+            font-size: 0.875rem;
+            color: #c0c0c0;
+            margin-bottom: 10px; /* Increase spacing below the description */
+        }
+
+        .rating {
+            font-size: 1rem;
+            color: #f59e0b;
+        }
+
+        .chapter-info {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px; /* Space above chapter info */
+            width: 100%;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+
+        .chapter-info p {
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .chapter-info a {
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .chapter-info a:hover {
+            color: #f59e0b;
+        }
+
+        footer {
+            background: #0a0a0a;
+            padding: 20px 0;
+            text-align: center;
+            color: #00ffff;
+            border-top: 2px solid #00ffff;
+            margin-top: auto;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <h1 class="site-title">MangaHub</h1>
+        <nav class="main-nav">
+            <a href="/manga/latest"><i class="fas fa-clock"></i> Latest</a>
+            <a href="/manga/browse"><i class="fas fa-search"></i> Browse</a>
+            <a href="/manga/history" th:if="${#authentication != null}"><i class="fas fa-history"></i> History</a>
+            <a href="/bookmarks" th:if="${#authentication != null}"><i class="fas fa-bookmark"></i> Bookmarks</a>
+            <a href="/manga/upload" th:if="${#authorization.expression('hasRole(''ROLE_PUBLISHER'')')}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Publish
+            </a>
+
+            <form action="/logout" method="post" th:if="${#authentication != null}" class="logout-form">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </form>
+        </nav>
+    </div>
+</header>
+
+<main class="site-main">
+    <div class="container">
+        <section class="featured-section">
+            <h2 class="section-title">Featured Manga</h2>
+            <div class="manga-grid">
+                <div class="manga-item" th:each="manga : ${featuredMangas}">
+                    <img th:src="${manga.coverImage}" alt="Manga Cover" class="manga-cover">
+                    <h3 th:text="${manga.title}">Manga Title</h3>
+                    <a th:href="@{/manga/{id}(id=${manga.id})}" class="btn btn-primary">Read Now</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-access-section">
+            <div class="dropdown-container">
+                <div class="dropdown">
+                    <button class="dropdown-button"><i class="fas fa-clock"></i> My History</button>
+                    <div class="dropdown-content">
+                        <a href="#" th:each="historyItem : ${userHistory}">
+                            <span th:text="${historyItem.mangaTitle}">Manga Title</span>
+                            <span th:text="${historyItem.chapterNumber}">Chapter 1</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropdown-button"><i class="fas fa-fire"></i> Popular Updates</button>
+                    <div class="dropdown-content">
+                        <a href="#" th:each="popularManga : ${popularMangas}">
+                            <span th:text="${popularManga.title}">Popular Manga Title</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropdown-button"><i class="fas fa-bolt"></i> Latest Releases</button>
+                    <div class="dropdown-content">
+                        <a href="#" th:each="latestRelease : ${latestReleases}">
+                            <span th:text="${latestRelease.mangaTitle}">Latest Manga Title</span>
+                            <span th:text="${latestRelease.chapterNumber}">Chapter 10</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; 2024 MangaHub | <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
+    </div>
+</footer>
+
+<script>
+    document.querySelectorAll('.dropdown-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const content = button.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+</script>
+</body>
+</html>

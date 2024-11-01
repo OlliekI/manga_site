@@ -1,0 +1,208 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #e0e0e0;
+    background: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Ensure the main content expands to fill available space */
+main {
+    flex: 1;
+}
+
+/* Header */
+.site-header {
+    background: #1a1a1a;
+    padding: 20px 0;
+    border-bottom: 2px solid #00ffff;
+}
+
+/* Typography */
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: #00ffff;
+    margin-bottom: 20px;
+}
+
+/* Navigation */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+nav a {
+    color: #00ffff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+}
+
+nav a:hover {
+    color: #f59e0b;
+}
+
+/* Button Styles */
+.btn {
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    background-color: #00ffff;
+    color: #000;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #f59e0b;
+}
+
+/* Layout */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* Manga grid layout */
+.manga-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.manga-item {
+    flex: 1 1 200px; /* Ensures the grid items wrap properly */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #1a1a1a;
+    padding: 15px;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.manga-item:hover {
+    transform: scale(1.05);
+}
+
+.manga-cover {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+/* Manga Info */
+.manga-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.manga-info {
+    flex: 1;
+}
+
+/* Manga description */
+.manga-description {
+    font-size: 1rem;
+    margin-top: 10px;
+    color: #c0c0c0;
+}
+
+/* Chapter list */
+.chapter-list {
+    margin-top: 20px;
+}
+
+.chapter-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.chapter-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #444;
+}
+
+/* Footer */
+footer {
+    background: #0a0a0a;
+    padding: 20px 0;
+    text-align: center;
+    color: #00ffff;
+    border-top: 2px solid #00ffff;
+    margin-top: auto;
+}
+
+/* Dropdown styling */
+.dropdown-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-button {
+    background-color: #1a1a1a;
+    color: #00ffff;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #1a1a1a;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    color: #c0c0c0;
+    text-decoration: none;
+    display: block;
+    padding: 5px 10px;
+}
+
+.dropdown-content a:hover {
+    color: #f59e0b;
+}

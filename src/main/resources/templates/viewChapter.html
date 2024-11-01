@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${chapter.title}">Chapter Title</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: #e0e0e0;
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    /* Typography */
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #00ffff;
+      margin-bottom: 20px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 15px;
+    }
+
+    nav a {
+      color: #00ffff;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 10px 15px;
+    }
+
+    nav a:hover {
+      color: #f59e0b;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      background-color: #00ffff;
+      color: #000;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #f59e0b;
+    }
+
+    /* Layout */
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
+
+    .manga-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .manga-cover img {
+      max-width: 200px;
+      height: auto;
+      border-radius: 0.5rem;
+    }
+
+    .manga-info {
+      flex-grow: 1;
+    }
+
+    .chapter-list {
+      margin-top: 20px;
+    }
+
+    .chapter-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    /* Chapters and Buttons */
+    .chapter-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Rating Styles */
+    .rating {
+      color: yellow;
+      font-size: 1.2rem;
+    }
+
+    .star-rating {
+      direction: rtl;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .star-rating input {
+      display: none;
+    }
+
+    .star-rating label {
+      font-size: 2rem;
+      color: #e0e0e0;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: yellow;
+    }
+
+    /* Add space between chapters container and bookmark button */
+    .bookmark-form {
+      margin-top: 20px;
+    }
+
+    .rating-form {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Chapter Images */
+    .chapter-images {
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center the images horizontally */
+      margin-top: 20px;
+    }
+
+    .chapter-image {
+      max-width: 90%; /* Make images larger, but responsive */
+      height: auto;
+      margin-bottom: 20px; /* Space between images */
+      border-radius: 0.5rem; /* Optional: rounded corners */
+    }
+
+    footer {
+      background: #0a0a0a;
+      padding: 20px 0;
+      text-align: center;
+      color: #00ffff;
+      border-top: 2px solid #00ffff;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <h1 class="site-title">MangaHub</h1>
+    <nav class="main-nav">
+      <a href="/" class="nav-link"><i class="fas fa-home"></i>Home</a>
+      <a href="/manga/latest"><i class="fas fa-clock"></i> Latest</a>
+      <a href="/manga/browse"><i class="fas fa-search"></i> Browse</a>
+      <a href="/manga/history" th:if="${#authentication != null}"><i class="fas fa-history"></i> History</a>
+      <a href="/bookmarks" th:if="${#authentication != null}"><i class="fas fa-bookmark"></i> Bookmarks</a>
+      <a href="/manga/upload" th:if="${#authentication != null and #authorization.expression('hasRole(''ROLE_PUBLISHER'')')}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Publish
+      </a>
+
+      <form action="/logout" method="post" th:if="${#authentication != null}" class="logout-form">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        <button type="submit" class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </form>
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <div class="container">
+    <div class="chapter-details">
+      <div class="chapter-info">
+        <h1 th:text="${chapter.title}">Chapter Title</h1>
+        <div class="navigation-buttons">
+          <a th:href="@{/manga/chapter/{id}(id=${previousChapterId})}" th:if="${previousChapterId != null}" class="btn btn-secondary">Previous Chapter</a>
+          <a th:href="@{/manga/chapter/{id}(id=${nextChapterId})}" th:if="${nextChapterId != null}" class="btn btn-primary">Next Chapter</a>
+          <a th:href="@{/manga/{id}(id=${manga.id})}" class="btn btn-back">Back to Details</a>
+        </div>
+      </div>
+
+      <div class="chapter-images">
+        <img th:each="imageUrl : ${chapter.imageUrls}" th:src="@{${imageUrl}}" alt="Chapter Image" class="chapter-image"/>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2024 MangaHub | <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>User Profile</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</head>
+<body>
+<header>
+  <nav class="main-nav">
+    <a href="/"><i class="fas fa-home"></i>Home</a>
+  <a href="/manga/latest"><i class="fas fa-clock"></i> Latest</a>
+  <a href="/manga/browse"><i class="fas fa-search"></i> Browse</a>
+  <a href="/manga/history" th:if="${#authentication != null}"><i class="fas fa-history"></i> History</a>
+  <a href="/bookmarks" th:if="${#authentication != null}"><i class="fas fa-bookmark"></i> Bookmarks</a>
+  <a href="/manga/upload" th:if="${#authorization.expression('hasRole(''ROLE_PUBLISHER'')')}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Publish
+  </a>
+
+  <form action="/logout" method="post" th:if="${#authentication != null}" class="logout-form">
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+    <button type="submit" class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </form>
+</nav>
+</header>
+<h1>User Profile</h1>
+<p>Username: <span th:text="${user.username}"></span></p>
+<p>Email: <span th:text="${user.email}"></span></p>
+<p>Read Manga: <span th:text="${readMangaCount}"></span></p>
+<p>Bookmarked Manga: <span th:text="${bookmarkedMangaCount}"></span></p>
+<a th:href="@{/user/edit}">Edit Profile</a>
+</body>
+</html>

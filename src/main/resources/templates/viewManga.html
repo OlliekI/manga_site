@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${manga.title}">Manga Title</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: #e0e0e0;
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    /* Typography */
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #00ffff;
+      margin-bottom: 20px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 15px;
+    }
+
+    nav a {
+      color: #00ffff;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 10px 15px;
+    }
+
+    nav a:hover {
+      color: #f59e0b;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      background-color: #00ffff;
+      color: #000;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #f59e0b;
+    }
+
+    /* Layout */
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
+
+    .manga-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .manga-cover img {
+      max-width: 200px;
+      height: auto;
+      border-radius: 0.5rem;
+    }
+
+    .manga-info {
+      flex-grow: 1;
+    }
+
+    .chapter-list {
+      margin-top: 20px;
+    }
+
+    .chapter-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    /* Chapters and Buttons */
+    .chapter-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Rating Styles */
+    .rating {
+      color: yellow;
+      font-size: 1.2rem;
+    }
+
+    .star-rating {
+      direction: rtl;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .star-rating input {
+      display: none;
+    }
+
+    .star-rating label {
+      font-size: 2rem;
+      color: #e0e0e0;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: yellow;
+    }
+
+    /* Add space between chapters container and bookmark button */
+    .bookmark-form {
+      margin-top: 20px;
+    }
+
+    .rating-form {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    footer {
+      background: #0a0a0a;
+      padding: 20px 0;
+      text-align: center;
+      color: #00ffff;
+      border-top: 2px solid #00ffff;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <h1 class="site-title">MangaHub</h1>
+    <nav class="main-nav">
+      <a href="/" class="nav-link"><i class="fas fa-home"></i>Home</a>
+      <a href="/manga/latest"><i class="fas fa-clock"></i> Latest</a>
+      <a href="/manga/browse"><i class="fas fa-search"></i> Browse</a>
+      <a href="/manga/history" th:if="${#authentication != null}"><i class="fas fa-history"></i> History</a>
+      <a href="/bookmarks" th:if="${#authentication != null}"><i class="fas fa-bookmark"></i> Bookmarks</a>
+      <a href="/manga/upload" th:if="${#authentication != null and #authorization.expression('hasRole(''ROLE_PUBLISHER'')') and manga.author == #authentication.name}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Publish
+      </a>
+
+      <form action="/logout" method="post" th:if="${#authentication != null}" class="logout-form">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        <button type="submit" class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </form>
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <div class="container">
+    <div class="manga-container">
+      <div class="manga-header">
+        <div class="manga-cover">
+          <img th:src="${manga.coverImage}" alt="Manga Cover">
+        </div>
+        <div class="manga-info">
+          <h1 class="manga-title" th:text="${manga.title}">Manga Title</h1>
+          <p class="manga-description" th:text="${manga.description}">Manga Description</p>
+          <!-- Display Average Rating -->
+          <p class="rating">Rating: <span th:text="${formattedRating}">0.0</span></p>
+        </div>
+      </div>
+
+      <!-- Chapter List -->
+      <div class="chapter-list">
+        <div class="chapter-list-header">
+          <h3>Chapters</h3>
+          <a href="#" th:href="@{/manga/{mangaId}/chapter/upload(mangaId=${manga.id})}"
+             th:if="${#authentication != null and #authorization.expression('hasRole(''ROLE_PUBLISHER'')') and manga.author == #authentication.name}"
+             class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Chapter
+          </a>
+        </div>
+        <div class="chapter-item" th:each="chapter : ${manga.chapters}">
+          <a th:href="@{/manga/chapter/{id}(id=${chapter.id})}" th:text="${chapter.title}">Chapter Title</a>
+          <span th:text="${chapter.releaseDate}">Release Date</span>
+        </div>
+      </div>
+
+      <!-- Bookmark Form -->
+      <form th:action="@{/manga/bookmark}" method="post" class="bookmark-form" th:if="${#authentication != null}">
+        <input type="hidden" name="mangaId" th:value="${manga.id}" />
+        <input type="hidden" name="remove" th:value="${isBookmarked ? 'true' : 'false'}" />
+        <button type="submit" class="btn btn-bookmark" th:text="${isBookmarked ? 'Unbookmark' : 'Bookmark'}"></button>
+      </form>
+
+      <!-- Rating Form -->
+      <form th:action="@{/rate}" method="post" class="rating-form">
+        <input type="hidden" name="mangaId" th:value="${manga.id}" />
+        <div class="star-rating">
+          <input type="radio" id="star5" name="rating" value="5" /><label for="star5">&#9733;</label>
+          <input type="radio" id="star4" name="rating" value="4" /><label for="star4">&#9733;</label>
+          <input type="radio" id="star3" name="rating" value="3" /><label for="star3">&#9733;</label>
+          <input type="radio" id="star2" name="rating" value="2" /><label for="star2">&#9733;</label>
+          <input type="radio" id="star1" name="rating" value="1" /><label for="star1">&#9733;</label>
+        </div>
+        <button type="submit" class="btn">Submit Rating</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2024 MangaHub | <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
+  </div>
+</footer>
+</body>
+</html>

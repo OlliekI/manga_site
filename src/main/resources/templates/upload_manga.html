@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MangaHub - Upload Manga</title>
+  <style>
+    /* Reset and base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        color: #e0e0e0;
+        background: #0a0a0a;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    main {
+     flex: 1; /* This makes the main content expand to fill the available space */
+    }
+
+    /* Typography */
+    h1 {
+        font-family: 'Orbitron', sans-serif;
+        color: #00ffff;
+        margin-bottom: 20px;
+    }
+
+    /* Navbar */
+    nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 15px; /* Add gap between nav items */
+    }
+
+    nav a {
+        color: #00ffff;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block; /* Ensures all items are aligned properly */
+        padding: 10px 15px;
+    }
+
+    nav a:hover {
+        color: #f59e0b; /* Highlight color on hover */
+    }
+
+    /* Button Styles */
+    .btn {
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        background-color: #00ffff;
+        color: #000;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #f59e0b;
+    }
+
+    /* Layout */
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+
+    .manga-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px; /* Increase gap between items */
+    }
+
+    .flex {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+        background: #1a1a1a;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+        width: 100%;
+        max-width: 350px; /* Adjust width as needed */
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        padding-bottom: 50px; /* Add padding to the bottom to accommodate the button */
+    }
+
+    .flex:hover {
+        transform: scale(1.05);
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+        max-height: 250px; /* Adjust max height */
+        object-fit: cover; /* Ensure the image covers the area without distortion */
+        border-radius: 0.5rem;
+    }
+
+    .pl-3 {
+        padding-left: 1rem;
+    }
+
+    .grow {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Space out content vertically */
+    }
+
+    /* Title and Description Styling */
+    h3 {
+        font-size: 1.5rem;
+        color: #00ffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+        margin-bottom: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal; /* Allow text to wrap */
+        word-break: break-word; /* Break long words if necessary */
+    }
+
+    p {
+        font-size: 1rem;
+        margin: 10px 0;
+        color: #c0c0c0; /* Slightly lighter grey for the description */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal; /* Allow text to wrap */
+        word-break: break-word; /* Break long words if necessary */
+    }
+
+    .btn-primary {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: #00ffff; /* Button color */
+        color: #000; /* Button text color */
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        white-space: nowrap; /* Prevent text from wrapping */
+    }
+
+    .btn-primary:hover {
+        background-color: #f59e0b; /* Button hover color */
+    }
+
+    footer {
+     background: #0a0a0a;
+     padding: 20px 0;
+     text-align: center;
+     color: #00ffff;
+     border-top: 2px solid #00ffff;
+     margin-top: auto; /* Pushes the footer to the bottom */
+ }
+
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <h1 class="site-title">MangaHub</h1>
+    <nav class="main-nav">
+      <a href="/"><i class="fas fa-home"></i> Home</a>
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <div class="container">
+    <h2 class="section-title"><i class="fas fa-book"></i> Upload New Manga</h2>
+    <form th:action="@{/manga/upload}" th:object="${manga}" method="post" class="form-container">
+      <div class="input-group">
+        <i class="fas fa-heading"></i>
+        <input type="text" id="title" th:field="*{title}" placeholder="Manga Title" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-align-left"></i>
+        <textarea id="description" th:field="*{description}" placeholder="Manga Description" required></textarea>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-user-edit"></i>
+        <input type="text" id="author" th:field="*{author}" placeholder="Author Name" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-image"></i>
+        <input type="url" id="coverImage" th:field="*{coverImage}" placeholder="Cover Image URL" required>
+        <img id="coverImagePreview" src="" alt="Cover Image Preview" style="display:none; margin-top: 10px; max-width: 200px;">
+      </div>
+
+      <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Manga</button>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; 2024 MangaHub | <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
+  </div>
+</footer>
+<script>
+  const coverImageInput = document.getElementById('coverImage');
+  const coverImagePreview = document.getElementById('coverImagePreview');
+
+  coverImageInput.addEventListener('input', function() {
+      const url = coverImageInput.value;
+      if (url) {
+          coverImagePreview.src = url;
+          coverImagePreview.style.display = 'block';
+      } else {
+          coverImagePreview.style.display = 'none';
+      }
+  });
+</script>
+</body>
+</html>

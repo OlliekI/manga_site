@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MangaHub - Bookmarks</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #e0e0e0;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+        }
+        /* Typography */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00ffff;
+            margin-bottom: 20px;
+        }
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+        }
+        nav a {
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            padding: 10px 15px;
+        }
+        nav a:hover {
+            color: #f59e0b;
+        }
+        /* Button Styles */
+        .btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            background-color: #00ffff;
+            color: #000;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #f59e0b;
+        }
+        .btn-primary {
+            background-color: #00ffff;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+        .btn-primary:hover {
+            background-color: #f59e0b;
+        }
+        footer {
+            background: #0a0a0a;
+            padding: 20px 0;
+            text-align: center;
+            color: #00ffff;
+            border-top: 2px solid #00ffff;
+            margin-top: auto;
+        }
+        /* Layout */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        .manga-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .flex {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            width: 100%;
+            max-width: 350px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .flex:hover {
+            transform: scale(1.05);
+        }
+        img {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+        .pl-3 {
+            padding-left: 1rem;
+        }
+        .grow {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        h3 {
+            font-size: 1.5rem;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-word;
+        }
+        p {
+            font-size: 1rem;
+            margin: 10px 0;
+            color: #c0c0c0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-word;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Bookmarked Manga</h1>
+        <nav>
+            <a href="/"><i class="fas fa-home"></i>Home</a>
+            <a href="/manga/latest"><i class="fas fa-clock"></i> Latest</a>
+            <a href="/manga/browse"><i class="fas fa-search"></i> Browse</a>
+            <a href="/manga/history" th:if="${#authentication != null}"><i class="fas fa-history"></i> History</a>
+            <a href="/manga/upload" th:if="${#authorization.expression('hasRole(''ROLE_PUBLISHER'')')}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Publish
+            </a>
+            <form action="/logout" method="post" th:if="${#authentication != null}" class="logout-form">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </form>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <div class="manga-grid">
+            <div class="flex" th:each="bookmarkedManga : ${bookmarkedMangas}">
+                <img th:src="${bookmarkedManga.manga.coverImage}" alt="Manga Cover" />
+                <div class="pl-3 grow">
+                    <h3 th:text="${bookmarkedManga.manga.title}">Manga Title</h3>
+                    <p th:text="${bookmarkedManga.manga.description}">Description</p>
+                    <a th:href="@{/manga/{id}(id=${bookmarkedManga.manga.id})}" class="btn-primary">Read Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2024 MangaHub | <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
+    </div>
+</footer>
+</body>
+</html>
